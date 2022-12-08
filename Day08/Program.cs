@@ -14,6 +14,7 @@ var trees = Input.Split("\n").Select(l => l.ToArray().Select(c => int.Parse(c.To
 var sideLength = trees.Length;
 
 // === Part one ===
+// Note: In hindesight, this was really not a good idea. This algorithm is not efficient and not elegant.
 var visibleTrees = new HashSet<(int, int)>();
 for (var i = 0; i < sideLength; i++)
 {
