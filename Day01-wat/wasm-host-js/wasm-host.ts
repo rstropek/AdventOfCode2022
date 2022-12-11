@@ -22,7 +22,7 @@ const input = `1000
   // Object with callbacks exported from JS to Wasm
   const callbacks = {
     cb: {
-      found_value_cb: function found_value_cb(value: number) {
+      found_value_cb(value: number) {
         console.log(`Found value: ${value}`);
       },
     },
