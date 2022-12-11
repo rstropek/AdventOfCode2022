@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Node host",
+            "request": "launch",
+            "runtimeArgs": [
+                "start"
+            ],
+            "runtimeExecutable": "npm",
+            "type": "node",
+            "cwd": "${workspaceFolder}/wasm-host-js"
+        },
+        {
+            "name": "Launch Rust host",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/wasm-host-rs/target/debug/wasm-host",
+            "args": [],
+            "cwd": "${workspaceFolder}/wasm-host-rs"
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+build:
+    wat2wasm aoc1.wat
+    cd {{justfile_directory()}}/wasm-host-rs; cargo build
+
+run-rs: (build)
+    cd {{justfile_directory()}}/wasm-host-rs; cargo run
+
+run-js: (build)
+    cd {{justfile_directory()}}/wasm-host-js; npm start
