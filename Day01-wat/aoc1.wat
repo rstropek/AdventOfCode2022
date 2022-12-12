@@ -74,12 +74,10 @@
     )
     (export "get_max" (func $get_max))
 
-    (func $parse_num (param $startIx i32) (param $len i32)
+    (func $parse_num (param $ix i32) (param $len i32)
         (result i32)
         (result i32)
-        (local $ix i32)
         (local $num i32)
-        (local.set $ix (local.get $startIx))
         (loop $loop
             ;; check if $m1[$ix] is not a \n and not the end of the input
             (i32.and
