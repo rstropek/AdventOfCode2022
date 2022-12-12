@@ -1,0 +1,13 @@
+build-plain:
+    cargo build --release --target wasm32-unknown-unknown
+    wasm2wat target/wasm32-unknown-unknown/release/full_rs.wasm -o target/wasm32-unknown-unknown/release/full_rs.wat
+
+build-wb:
+    wasm-pack build --target nodejs -- --features wasmbindgen
+    wasm2wat pkg/full_rs_bg.wasm -o pkg/full_rs_bg.wat
+
+run-plain: (build-plain)
+    node run-plain.js
+
+run-wb: (build-wb)
+    cd {{justfile_directory()}}/run-wasmbindgen; node run-wasmbindgen.js

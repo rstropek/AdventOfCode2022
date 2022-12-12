@@ -1,0 +1,18 @@
+{
+  "name": "run-wasmbindgen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build; node run-wasmbindgen.js",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "full-rs": "file:../pkg"
+  }
+}
