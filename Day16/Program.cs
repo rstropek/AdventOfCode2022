@@ -89,27 +89,25 @@ foreach (var v in valves.Values)
 System.Console.WriteLine();
 
 // === Part one ===
-var maxPreassure = 0;
-var maxPreassures = new Dictionary<string, MaxPreassure>();
-Release(valves["AA"], new(), 0);
+var maxPreassures = new Dictionary<MaxPreassureCache, int>();
+var max = Release(valves["AA"], new(), 0);
 
-// var analyze = preassureRelease
-//     .Where(p => p.path.Count >= 4 && p.path[0] == "DD" && p.path[1] == "BB" && p.path[1] == "JJ" && p.path[1] == "HH" && p.path[1] == "EE" && p.path[1] == "CC")
-//     .ToArray();
+System.Console.WriteLine(max);
+//System.Console.WriteLine(maxPreassures[new("AA", 0)]);
 
-Console.WriteLine(maxPreassure);
-
-int  Release(Valve v, List<string> opened, int elapsedMinutes)
+int Release(Valve v, HashSet<string> opened, int elapsedMinutes)
 {
-    // If 29 minutes have elapsed, we do not need to do anything else.
-    // Opening another valve would not change the preassure as the opening
-    // would not take effect.
+    if (maxPreassures.TryGetValue(new(v.ID, string.Join("", opened.Order()), elapsedMinutes), out var cachedMax))
+    {
+        return cachedMax;
+    }
+
     if (elapsedMinutes >= 29)
     {
         return 0;
     }
 
-    int VisitNexts(Valve v, List<string> opened, int elapsedMinutes)
+    int VisitNexts(Valve v, HashSet<string> opened, int elapsedMinutes)
     {
         var max = 0;
         foreach (var next in v.NextValves)
@@ -122,22 +120,28 @@ int  Release(Valve v, List<string> opened, int elapsedMinutes)
     }
 
     var maxWithoutOpening = VisitNexts(v, opened, elapsedMinutes + 1);
+    var maxWithOpening = 0;
 
     // Does it make sense to open the valve
     if (v.FlowRate > 0 && !opened.Contains(v.ID))
     {
-        var newOpened = new List<string>();
-        newOpened.AddRange(opened);
+        var newOpened = new HashSet<string>(opened);
         newOpened.Add(v.ID);
         opened = newOpened;
 
         var flowingTime = 30
             - 1 // Flow will start in one minute
             - elapsedMinutes; // Reduce flow time by time already over
-        releasedPreassure += v.FlowRate * flowingTime;
+        maxWithOpening = v.FlowRate * flowingTime;
 
-        VisitNexts(v, opened, elapsedMinutes + 2, releasedPreassure);
+        maxWithOpening += VisitNexts(v, opened, elapsedMinutes + 2);
     }
+
+    var newMax = Math.Max(maxWithoutOpening, maxWithOpening);
+
+    maxPreassures[new(v.ID, string.Join("", opened.Order()), elapsedMinutes)] = newMax;
+
+    return newMax;
 }
 
 // === Part two ===
@@ -154,4 +158,4 @@ record Valve(string ID, int FlowRate, string[] NextValveIDs)
     public Valve[] NextValves { get; set; }
 }
 
-record struct MaxPreassure(string ID, int elapsedTime, int maxPreassure);
+record struct MaxPreassureCache(string ID, string Opened, int ElapsedMinutes);
