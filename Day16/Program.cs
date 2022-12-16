@@ -90,7 +90,8 @@ System.Console.WriteLine();
 
 // === Part one ===
 var maxPreassure = 0;
-Release(valves["AA"], new(), 0, 0);
+var maxPreassures = new Dictionary<string, MaxPreassure>();
+Release(valves["AA"], new(), 0);
 
 // var analyze = preassureRelease
 //     .Where(p => p.path.Count >= 4 && p.path[0] == "DD" && p.path[1] == "BB" && p.path[1] == "JJ" && p.path[1] == "HH" && p.path[1] == "EE" && p.path[1] == "CC")
@@ -98,37 +99,29 @@ Release(valves["AA"], new(), 0, 0);
 
 Console.WriteLine(maxPreassure);
 
-void Release(Valve v, List<string> opened, int elapsedMinutes, int releasedPreassure)
+int  Release(Valve v, List<string> opened, int elapsedMinutes)
 {
     // If 29 minutes have elapsed, we do not need to do anything else.
     // Opening another valve would not change the preassure as the opening
     // would not take effect.
-
     if (elapsedMinutes >= 29)
     {
-        if (maxPreassure < releasedPreassure)
-        {
-            maxPreassure = releasedPreassure;
-        }
-
-        return;
+        return 0;
     }
 
-    void VisitNexts(Valve v, List<string> opened, int elapsedMinutes, int releasedPreassure)
+    int VisitNexts(Valve v, List<string> opened, int elapsedMinutes)
     {
-        var maxRemainingFlowingTime = Math.Max(0, 28 - elapsedMinutes);
-        var closedValves = valves.Where(v => !opened.Contains(v.Key));
-        var maxRemainingFlow = closedValves.Sum(v => v.Value.FlowRate * maxRemainingFlowingTime);
-        if ((releasedPreassure + maxRemainingFlow) > maxPreassure)
+        var max = 0;
+        foreach (var next in v.NextValves)
         {
-            foreach (var next in v.NextValves)
-            {
-                Release(next, opened, elapsedMinutes, releasedPreassure);
-            }
+            var r = Release(next, opened, elapsedMinutes);
+            if (r > max) { max = r; }
         }
+
+        return max;
     }
 
-    VisitNexts(v, opened, elapsedMinutes + 1, releasedPreassure);
+    var maxWithoutOpening = VisitNexts(v, opened, elapsedMinutes + 1);
 
     // Does it make sense to open the valve
     if (v.FlowRate > 0 && !opened.Contains(v.ID))
@@ -160,3 +153,5 @@ record Valve(string ID, int FlowRate, string[] NextValveIDs)
 {
     public Valve[] NextValves { get; set; }
 }
+
+record struct MaxPreassure(string ID, int elapsedTime, int maxPreassure);
