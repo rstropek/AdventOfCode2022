@@ -17,7 +17,62 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 """;
 
 const string Input = """
-
+Valve AA has flow rate=0; tunnels lead to valves RZ, QQ, FH, IM, VJ
+Valve FE has flow rate=0; tunnels lead to valves TM, TR
+Valve QZ has flow rate=19; tunnels lead to valves HH, OY
+Valve TU has flow rate=17; tunnels lead to valves NJ, IN, WN
+Valve RG has flow rate=0; tunnels lead to valves IK, SZ
+Valve TM has flow rate=0; tunnels lead to valves FE, JH
+Valve JH has flow rate=4; tunnels lead to valves NW, QQ, TM, VH, AZ
+Valve NW has flow rate=0; tunnels lead to valves JH, OB
+Valve BZ has flow rate=0; tunnels lead to valves XG, XF
+Valve VS has flow rate=0; tunnels lead to valves FF, GC
+Valve OI has flow rate=20; tunnel leads to valve SY
+Valve IK has flow rate=0; tunnels lead to valves RG, TR
+Valve RO has flow rate=0; tunnels lead to valves UZ, YL
+Valve LQ has flow rate=0; tunnels lead to valves IZ, PA
+Valve GG has flow rate=18; tunnels lead to valves GH, VI
+Valve NJ has flow rate=0; tunnels lead to valves TU, UZ
+Valve SY has flow rate=0; tunnels lead to valves OI, ZL
+Valve HH has flow rate=0; tunnels lead to valves QZ, WN
+Valve RZ has flow rate=0; tunnels lead to valves AA, UZ
+Valve OF has flow rate=0; tunnels lead to valves YL, IZ
+Valve IZ has flow rate=9; tunnels lead to valves OF, FH, VH, JZ, LQ
+Valve OB has flow rate=0; tunnels lead to valves UZ, NW
+Valve AH has flow rate=0; tunnels lead to valves FF, ZL
+Valve ZL has flow rate=11; tunnels lead to valves SY, VI, AH
+Valve BF has flow rate=0; tunnels lead to valves PA, YL
+Valve OH has flow rate=0; tunnels lead to valves CU, JZ
+Valve VH has flow rate=0; tunnels lead to valves IZ, JH
+Valve AZ has flow rate=0; tunnels lead to valves JC, JH
+Valve XG has flow rate=0; tunnels lead to valves BZ, PA
+Valve OY has flow rate=0; tunnels lead to valves PZ, QZ
+Valve IM has flow rate=0; tunnels lead to valves FM, AA
+Valve GO has flow rate=0; tunnels lead to valves VJ, TR
+Valve YL has flow rate=8; tunnels lead to valves JC, RO, OF, BF, FM
+Valve TY has flow rate=0; tunnels lead to valves SZ, TS
+Valve UZ has flow rate=5; tunnels lead to valves OB, NJ, RO, RZ, GC
+Valve XF has flow rate=21; tunnel leads to valve BZ
+Valve RY has flow rate=0; tunnels lead to valves TR, FF
+Valve QQ has flow rate=0; tunnels lead to valves JH, AA
+Valve TS has flow rate=0; tunnels lead to valves TY, FF
+Valve GC has flow rate=0; tunnels lead to valves VS, UZ
+Valve JC has flow rate=0; tunnels lead to valves AZ, YL
+Valve JZ has flow rate=0; tunnels lead to valves IZ, OH
+Valve IN has flow rate=0; tunnels lead to valves TH, TU
+Valve FM has flow rate=0; tunnels lead to valves IM, YL
+Valve FH has flow rate=0; tunnels lead to valves AA, IZ
+Valve VJ has flow rate=0; tunnels lead to valves AA, GO
+Valve TH has flow rate=0; tunnels lead to valves CU, IN
+Valve TR has flow rate=7; tunnels lead to valves FE, IK, RY, GO
+Valve GH has flow rate=0; tunnels lead to valves GG, FF
+Valve SZ has flow rate=10; tunnels lead to valves RG, TY
+Valve PA has flow rate=16; tunnels lead to valves XG, LQ, BF
+Valve PZ has flow rate=0; tunnels lead to valves CU, OY
+Valve VI has flow rate=0; tunnels lead to valves ZL, GG
+Valve CU has flow rate=22; tunnels lead to valves PZ, OH, TH
+Valve WN has flow rate=0; tunnels lead to valves TU, HH
+Valve FF has flow rate=13; tunnels lead to valves VS, RY, AH, TS, GH
 """;
 
 var regex = Data.InputRegex();
@@ -35,7 +90,7 @@ System.Console.WriteLine();
 
 // === Part one ===
 var maxPreassure = 0;
-Release(valves["AA"], new(), new(), 0, 0);
+Release(valves["AA"], new(), 0, 0);
 
 // var analyze = preassureRelease
 //     .Where(p => p.path.Count >= 4 && p.path[0] == "DD" && p.path[1] == "BB" && p.path[1] == "JJ" && p.path[1] == "HH" && p.path[1] == "EE" && p.path[1] == "CC")
@@ -43,55 +98,52 @@ Release(valves["AA"], new(), new(), 0, 0);
 
 Console.WriteLine(maxPreassure);
 
-void Release(Valve v, List<string> visited, List<string> opened, int elapsedMinutes, int releasedPreassure)
+void Release(Valve v, List<string> opened, int elapsedMinutes, int releasedPreassure)
 {
-    if (elapsedMinutes >= 28)
+    // If 29 minutes have elapsed, we do not need to do anything else.
+    // Opening another valve would not change the preassure as the opening
+    // would not take effect.
+
+    if (elapsedMinutes >= 29)
     {
         if (maxPreassure < releasedPreassure)
         {
-            System.Console.WriteLine(elapsedMinutes);
             maxPreassure = releasedPreassure;
         }
+
         return;
     }
 
-    var newVisited = new List<string>();
-    newVisited.AddRange(visited);
-    newVisited.Add(v.ID);
-    visited = newVisited;
+    void VisitNexts(Valve v, List<string> opened, int elapsedMinutes, int releasedPreassure)
+    {
+        var maxRemainingFlowingTime = Math.Max(0, 28 - elapsedMinutes);
+        var closedValves = valves.Where(v => !opened.Contains(v.Key));
+        var maxRemainingFlow = closedValves.Sum(v => v.Value.FlowRate * maxRemainingFlowingTime);
+        if ((releasedPreassure + maxRemainingFlow) > maxPreassure)
+        {
+            foreach (var next in v.NextValves)
+            {
+                Release(next, opened, elapsedMinutes, releasedPreassure);
+            }
+        }
+    }
 
-    if (v.FlowRate > 0)
+    VisitNexts(v, opened, elapsedMinutes + 1, releasedPreassure);
+
+    // Does it make sense to open the valve
+    if (v.FlowRate > 0 && !opened.Contains(v.ID))
     {
         var newOpened = new List<string>();
         newOpened.AddRange(opened);
         newOpened.Add(v.ID);
         opened = newOpened;
 
-        var newReleasedPreassure = releasedPreassure + v.FlowRate * (30 - 1 - elapsedMinutes);
+        var flowingTime = 30
+            - 1 // Flow will start in one minute
+            - elapsedMinutes; // Reduce flow time by time already over
+        releasedPreassure += v.FlowRate * flowingTime;
 
-        if ((newReleasedPreassure + valves.Where(v => !opened.Contains(v.Key)).Sum(v => v.Value.FlowRate * (30 - 2 - elapsedMinutes))) > maxPreassure)
-        {
-            //preassureRelease.Add((opened, newReleasedPreassure));
-            foreach (var next in v.NextValves)
-            {
-                // if (!opened.Contains(next.ID))
-                {
-                    Release(next, visited, opened, elapsedMinutes + 2, newReleasedPreassure);
-                }
-            }
-        }
-    }
-
-    //preassureRelease.Add((newPath, releasedPreassure));
-    if ((releasedPreassure + valves.Where(v => !opened.Contains(v.Key)).Sum(v => v.Value.FlowRate * (30 - 2 - elapsedMinutes))) > maxPreassure)
-    {
-        foreach (var next in v.NextValves)
-        {
-            // if (!opened.Contains(next.ID))
-            {
-                Release(next, visited, opened, elapsedMinutes + 1, releasedPreassure);
-            }
-        }
+        VisitNexts(v, opened, elapsedMinutes + 2, releasedPreassure);
     }
 }
 
