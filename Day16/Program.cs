@@ -248,6 +248,7 @@ void FindAllDistancesImpl(Valve from, List<(Valve Valve, int Distance)> distance
 
         if (changed) { FindAllDistancesImpl(next, distances, distance + 1); }
     }
+
 }
 
 // // === Part two ===
@@ -262,6 +263,7 @@ static partial class Data
 record Valve(string ID, int FlowRate, string[] NextValveIDs)
 {
     public Valve[] NextValves { get; set; }
+
     public List<(Valve Valve, int Distance)> Distances { get; set; }
 }
 
@@ -291,3 +293,5 @@ record Reality(HashSet<string> Opened)
 
     public List<string> OpenHistory { get; set; } = new();
 }
+
+
