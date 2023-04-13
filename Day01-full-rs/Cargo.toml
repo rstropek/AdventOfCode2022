@@ -11,3 +11,9 @@ wasmbindgen = ["dep:wasm-bindgen"]
 
 [dependencies]
 wasm-bindgen = { version = "0.2", optional = true }
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false

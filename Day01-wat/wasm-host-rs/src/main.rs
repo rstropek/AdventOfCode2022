@@ -43,7 +43,7 @@ fn main() -> Result<()> {
     }
 
     // Call wasm function
-    let double = instance.get_typed_func::<i32, i32, _>(&mut store, "get_max")?;
+    let double = instance.get_typed_func::<i32, i32>(&mut store, "get_max")?;
     let result = double.call(&mut store, INPUT.len() as i32)?;
 
     // Print result
