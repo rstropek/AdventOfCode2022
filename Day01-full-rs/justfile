@@ -5,6 +5,7 @@ build-plain:
 build-wb:
     wasm-pack build --target nodejs -- --features wasmbindgen
     wasm2wat pkg/full_rs_bg.wasm -o pkg/full_rs_bg.wat
+    cd {{justfile_directory()}}/run-wasmbindgen; npm run build
 
 run-plain: (build-plain)
     node run-plain.js

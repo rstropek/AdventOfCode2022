@@ -17,7 +17,6 @@ pub fn day_1_part_1_raw(ptr: *mut u8, len: usize) -> i32 {
     let bytes = unsafe { std::slice::from_raw_parts(ptr, len) };
     let input = std::str::from_utf8(bytes).unwrap();
     let result = day_1_part_1(input);
-    std::mem::forget(input);
     result
 }
 
